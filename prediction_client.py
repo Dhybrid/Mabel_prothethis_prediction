@@ -13,7 +13,7 @@ model = load_model()
 
 def show():
     # === App UI ===
-    st.title("🦴 Osteoporosis Risk Prediction (Amputation Context)")
+    st.title("🦴 Fractility Fracture Prediction Prediction (Amputation Context)")
     st.markdown("Fill in the patient's clinical, demographic, and lifestyle details:")
 
     # === Collect Inputs ===
