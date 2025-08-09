@@ -51,10 +51,15 @@ def show():
     years_amp = st.slider("Years with Amputation", 0, 60, 6)
     glucocorticoids = st.selectbox("Glucocorticoid Use?", list(bool_map.keys()))
     # chronic_illness = st.slider("Chronic Illness Count", 0, 5, 2)
-    chronic_illness = st.selectbox("Chronic Illness Count", [
-        "Gangrene", "Disease", "Diabetes", "Arterial", "Tumor", "Cancer"
+    # chronic_illness = st.selectbox("Chronic Illness Count", [
+    #     "Gangrene", "Disease", "Diabetes", "Arterial", "Tumor", "Cancer"
+    # ])
+    chronic_illness = st.selectbox("Chronic Illness / Cormorbidities", list(bool_map.keys()))
+    # chronic_detail = st.slider("Chronic Illness Detail ID", 0, 5, 2)
+
+    chronic_detail = st.selectbox("Chronic Illness Detail ID", [
+        "Trauma", "Vascular Disease", "Tumor/Cancer", "Infection", "Diabetes", "Gengrene", "Peripheral Artarial Disease", "Chronic bone deformity", "None"
     ])
-    chronic_detail = st.slider("Chronic Illness Detail ID", 0, 5, 2)
 
     supplements = st.selectbox("Taking Bone Supplements?", list(bool_map.keys()))
     gait_diff = st.selectbox("Gait Difficulty?", list(bool_map.keys()))
@@ -108,10 +113,10 @@ def show():
         ].index(amp_cause),
         'For how long have you been with amputation?': years_amp,
         'Glucocorticoid Use': bool_map[glucocorticoids],
-        'Chronic Illnesses': [
-            "Gangrene", "Disease", "Diabetes", "Arterial", "Tumor", "Cancer"
-        ].index(chronic_illness),
-        'Chronic Conditions Detail': chronic_detail,
+        'Chronic Illnesses': bool_map[chronic_illness],
+        'Chronic Conditions Detail': [
+            "Trauma", "Vascular Disease", "Tumor/Cancer", "Infection", "Diabetes", "Gengrene", "Peripheral Artarial Disease", "Chronic bone deformity", "None"
+        ].index(chronic_detail),
         'Are you taking any supplements(e.g. Calcium, Vitamin D) to support bone health?': bool_map[supplements],
         'Gait Difficulty': bool_map[gait_diff],
         'Have you noticed any changes in your gait or walking pattern?': bool_map[gait_change],
@@ -514,9 +519,9 @@ def show():
         )
 
         # ----- Risk Level -----
-        if probability >= 0.6:
+        if probability >= 0.7:
             risk_level = "🔴 <b style='color:red;'>High</b>"
-        elif probability >= 0.45:
+        elif probability >= 0.5:
             risk_level = "🟠 <b style='color:orange;'>Medium</b>"
         else:
             risk_level = "🔵 <b style='color:blue;'>Low</b>"
