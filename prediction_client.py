@@ -13,7 +13,7 @@ model = load_model()
 
 def show():
     # === App UI ===
-    st.title("🦴 Fractility Fracture Prediction")
+    st.title("🦴 Fragility Fracture Prediction")
     st.markdown("Fill in the patient's clinical, demographic, and lifestyle details:")
 
     # === Collect Inputs ===
@@ -46,7 +46,7 @@ def show():
     ])
     # amp_cause = st.slider("Cause of Amputation (Numeric ID)", 0, 5, 1)
     amp_cause = st.selectbox("Cause of Amputation", [
-        "Trauma", "Diabetes", "PAD", "Cancer", "Infection"
+        "Trauma", "Vascular Disease", "Tumor/Cancer", "Infection", "Diabetes", "Gengrene", "Peripheral Artarial Disease", "Chronic bone deformity"
     ])
     years_amp = st.slider("Years with Amputation", 0, 60, 6)
     glucocorticoids = st.selectbox("Glucocorticoid Use?", list(bool_map.keys()))
@@ -54,11 +54,11 @@ def show():
     # chronic_illness = st.selectbox("Chronic Illness Count", [
     #     "Gangrene", "Disease", "Diabetes", "Arterial", "Tumor", "Cancer"
     # ])
-    chronic_illness = st.selectbox("Chronic Illness / Cormorbidities", list(bool_map.keys()))
+    chronic_illness = st.selectbox("Chronic Illness / Cormorbidities?", list(bool_map.keys()))
     # chronic_detail = st.slider("Chronic Illness Detail ID", 0, 5, 2)
 
     chronic_detail = st.selectbox("Chronic Illness Detail ID", [
-        "Trauma", "Vascular Disease", "Tumor/Cancer", "Infection", "Diabetes", "Gengrene", "Peripheral Artarial Disease", "Chronic bone deformity", "None"
+        "Arthritis", "Rheumatoid Arthritis", "Osteoarthritis", "Hypertension", "Diabetes", "Peripheral Artarial Disease", "None"
     ])
 
     supplements = st.selectbox("Taking Bone Supplements?", list(bool_map.keys()))
@@ -76,7 +76,7 @@ def show():
     ])
     history_falls = st.selectbox("History of Falls?", list(bool_map.keys()))
     prosthesis_years = st.slider("Years Using Prosthetic Limb", 0, 50, 3)
-    prosthesis_issues = st.selectbox("Complications with Prosthesis?", list(bool_map.keys()))
+    prosthesis_issues = st.selectbox("Complications with Prosthesis (Pain, Discomfort, Loose/Tight fitting)?", list(bool_map.keys()))
 
     activity_level = st.selectbox("Activity Level with Prosthesis (ID)", [0, 1, 2])
     regular_exercise = st.selectbox("Engages in Regular Exercise?", list(bool_map.keys()))
@@ -115,7 +115,7 @@ def show():
         'Glucocorticoid Use': bool_map[glucocorticoids],
         'Chronic Illnesses': bool_map[chronic_illness],
         'Chronic Conditions Detail': [
-            "Trauma", "Vascular Disease", "Tumor/Cancer", "Infection", "Diabetes", "Gengrene", "Peripheral Artarial Disease", "Chronic bone deformity", "None"
+            "Arthritis", "Rheumatoid Arthritis", "Osteoarthritis", "Hypertension", "Diabetes", "Peripheral Artarial Disease", "None"
         ].index(chronic_detail),
         'Are you taking any supplements(e.g. Calcium, Vitamin D) to support bone health?': bool_map[supplements],
         'Gait Difficulty': bool_map[gait_diff],
