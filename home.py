@@ -6,7 +6,7 @@ from io import BytesIO
 def show():
     # Title
     st.markdown(
-        "<h1 style='text-align:center; color:#3366cc;'>🦿 Osteoarthritis & Fracture Predictor</h1>",
+        "<h1 style='text-align:center; color:#3366cc;'>🦿 Fragility Fracture & Osteoarthritis Prediction</h1>",
         unsafe_allow_html=True
     )
     st.markdown(
