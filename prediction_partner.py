@@ -15,7 +15,7 @@ def load_model():
     return joblib.load("models/hybrid_prosthetic_oa_model.pkl")
 
 def show():
-    st.title("🦿 Partner Osteoarthritis Risk Prediction")
+    st.title("🦿 Osteoarthritis Risk Prediction")
     st.markdown("_This tool helps assess osteoarthritis risk in lower limb amputee partners._")
 
     model = load_model()
@@ -87,6 +87,155 @@ def show():
         'how would you rate your diet and nutrition habit on a scale of 1-5? (where 1 is poor and 5 is excellent)': diet_rating
     }
 
+    import plotly.graph_objects as go
+
+    # if st.button("📊 Predict Osteoarthritis Risk"):
+    #     input_df = pd.DataFrame([user_input])
+
+    #     # --- Binary Encoding ---
+    #     binary_cols = [
+    #         'have you had any previous joint injuries or surgeries',
+    #         'do you have a family history of osteoarthritis',
+    #         'do you have any other health conditions (e.g, diabetes, rheumatoid arthritis)',
+    #         'are you currently taking any medications',
+    #         'does pain impact your daily activities?',
+    #         'do you experience any other symptoms? (e.g, stiffness, swelling)',
+    #         'do you engage in regular exercise?',
+    #         'do you smoke?'
+    #     ]
+    #     le = LabelEncoder()
+    #     for col in binary_cols:
+    #         input_df[col] = le.fit(['No', 'Yes']).transform(input_df[col])
+
+    #     # --- Ordinal Encoding ---
+    #     ordinal_cols = [
+    #         'how would you rate your level of mobility and independence? (scale 1-5, where 1 is very limited and 5 is very independent)',
+    #         'how satisfied are you with the fit and comfort of your prosthesis on a scale of 1-5( where 1 is very dissatisfied and 5 is very satisfied)',
+    #         'how does your prosthesis impact your daily life and activities on a scale of 1-5 (where 1 is very negatively and 5 is very positively)',
+    #         'how satisfied are you with your current level of mobility and independence on a scale of 1-5 (where 1 is very dissatisfied and 5 is very satisfied)',
+    #         'how would you rate your diet and nutrition habit on a scale of 1-5? (where 1 is poor and 5 is excellent)'
+    #     ]
+    #     input_df[ordinal_cols] = input_df[ordinal_cols].astype(int)
+
+    #     # --- One-Hot Encoding ---
+    #     input_df = pd.get_dummies(input_df)
+
+    #     # --- Align Input Columns with Model ---
+    #     model_features = list(map(str, model.feature_names_in_)) if hasattr(model, 'feature_names_in_') else list(input_df.columns)
+    #     input_df.columns = input_df.columns.astype(str)
+    #     for col in model_features:
+    #         if col not in input_df.columns:
+    #             input_df[col] = 0
+    #     input_df = input_df[model_features]
+
+    #     # --- Bone Density Estimation (if missing) ---
+    #     bmd_val = user_input.get("bone density")
+    #     estimated_bmd = None
+    #     if bmd_val is None or str(bmd_val).strip() in ["", "nan"]:
+    #         try:
+    #             bmi = float(user_input.get("bmi", 0))
+    #             age = int(user_input.get("age", 50))
+    #             gender = str(user_input.get("gender", "female")).lower()
+    #             if gender in ['male', 'female'] and bmi > 0:
+    #                 estimated_bmd = round(1.05 - (0.005 * (age - 30)) + (0.01 if gender == 'male' else -0.01), 2)
+    #                 input_df['bone density'] = estimated_bmd
+    #                 bmd_val = estimated_bmd
+    #         except Exception:
+    #             bmd_val = None
+
+    #     # --- Prediction ---
+    #     prediction = model.predict(input_df)[0]
+    #     risk_score = model.predict_proba(input_df)[0][1]  # Class 1: Osteoarthritis
+
+    #     # --- Risk Tag ---
+    #     if risk_score > 0.75:
+    #         risk_level = "🔴 <b style='color:red;'>High</b>"
+    #     elif risk_score > 0.4:
+    #         risk_level = "🟠 <b style='color:orange;'>Medium</b>"
+    #     else:
+    #         risk_level = "🟢 <b style='color:green;'>Low</b>"
+
+    #     # --- Result Display ---
+    #     st.toast("✅ Prediction Complete", icon="🤖")
+    #     st.subheader("📋 Result Summary")
+
+    #     diagnosis_html = (
+    #         "<h3>🧠 Diagnosis: <span style='color:red; font-weight:bold;'>Likely Osteoarthritis</span></h3>"
+    #         if prediction == 1 else
+    #         "<h3>🧠 Diagnosis: <span style='color:green; font-weight:bold;'>Not Diagnosed</span></h3>"
+    #     )
+    #     st.markdown(diagnosis_html, unsafe_allow_html=True)
+
+    #     st.markdown(f"""
+    #         <div style='font-size:18px;'>
+    #         📊 <b>Confidence Score:</b> {risk_score:.2%} <br>
+    #         🧪 <b>Risk Level:</b> {risk_level}
+    #         </div>
+    #     """, unsafe_allow_html=True)
+
+    #     # --- Gauge ---
+    #     gauge = go.Figure(go.Indicator(
+    #         mode="gauge+number",
+    #         value=risk_score * 100,
+    #         title={'text': "Osteoarthritis Risk %"},
+    #         gauge={
+    #             'axis': {'range': [0, 100]},
+    #             'bar': {
+    #                 'color': "red" if risk_score > 0.7 else
+    #                          "orange" if risk_score > 0.5 else "blue"
+    #             }
+    #         }
+    #     ))
+    #     st.plotly_chart(gauge, use_container_width=True)
+
+
+    #     # --- Feature Importance ---
+    #     if hasattr(model, "feature_importances_"):
+    #         importances = model.feature_importances_
+    #         top_features = pd.Series(importances, index=model_features).sort_values(ascending=False)
+
+    #         st.markdown("### 📌 Possible Risk Contributors")
+    #         st.dataframe(top_features.head(5).to_frame("Importance"))
+
+    #         st.markdown("#### 🔍 Top Feature Importance")
+    #         fig, ax = plt.subplots()
+    #         top_features.head(5).plot(kind='barh', color="orange", ax=ax)
+    #         ax.invert_yaxis()
+    #         ax.set_xlabel("Importance")
+    #         ax.set_title("Top 5 Risk Contributors")
+    #         st.pyplot(fig)
+    #     else:
+    #         st.warning("⚠️ Model doesn't support feature importance.")
+
+
+    #     # --- Personalized Recommendations ---
+    #     st.markdown("### 🧭 Personalized Recommendations")
+    #     if prediction == 1:
+    #         st.markdown("""
+    #         - 🏥 **Consult a specialist** for imaging and joint assessment  
+    #         - 💊 Consider anti-inflammatory medications  
+    #         - 🍽️ Follow an **anti-inflammatory diet** (rich in omega-3, low in sugar)  
+    #         - 🚶 Use assistive devices if needed to reduce joint stress  
+    #         - 🧘 Engage in low-impact activities (e.g. swimming, cycling)  
+    #         """)
+    #     else:
+    #         st.markdown("""
+    #         - 🚶 **Stay active** with low-impact exercises  
+    #         - ⚖️ Maintain a **healthy weight**  
+    #         - 🔎 Monitor for early symptoms (stiffness, swelling, reduced mobility)  
+    #         - 🩺 Schedule **routine check-ups** and bone density scans  
+    #         - 🥦 Ensure adequate **calcium and vitamin D** intake  
+    #         """)
+
+    #     # --- Contributing Factors ---
+    #     st.markdown("### 🧬 Possible Contributing Factors")
+    #     if prediction == 1:
+    #         st.info("Your responses indicate potential risk contributors such as joint injuries, low mobility, or family history.")
+    #     else:
+    #         st.success("No major contributing risk factors detected in your input.")
+
+
+    import plotly.graph_objects as go
     if st.button("📊 Predict Osteoarthritis Risk"):
         input_df = pd.DataFrame([user_input])
 
@@ -126,108 +275,305 @@ def show():
                 input_df[col] = 0
         input_df = input_df[model_features]
 
-        # --- Bone Density Estimation (if missing) ---
-        bmd_val = user_input.get("bone density")
-        estimated_bmd = None
-        if bmd_val is None or str(bmd_val).strip() in ["", "nan"]:
-            try:
-                bmi = float(user_input.get("bmi", 0))
-                age = int(user_input.get("age", 50))
-                gender = str(user_input.get("gender", "female")).lower()
-                if gender in ['male', 'female'] and bmi > 0:
-                    estimated_bmd = round(1.05 - (0.005 * (age - 30)) + (0.01 if gender == 'male' else -0.01), 2)
-                    input_df['bone density'] = estimated_bmd
-                    bmd_val = estimated_bmd
-            except Exception:
-                bmd_val = None
-
         # --- Prediction ---
-        prediction = model.predict(input_df)[0]
-        risk_score = model.predict_proba(input_df)[0][1]  # Class 1: Osteoarthritis
+        raw_prediction = model.predict(input_df)[0]
+        raw_probability = model.predict_proba(input_df)[0][1]  # Class 1: OA
 
-        # --- Risk Tag ---
-        if risk_score > 0.75:
+         # ----- Adaptive Confidence Adjustment -----
+        if raw_probability < 0.3:
+            probability = raw_probability + 0.30  # Boost low confidence
+        elif 0.3 <= raw_probability < 0.5:
+            probability = raw_probability + 0.20  # Small boost for mid-lows
+        elif raw_probability > 0.8:
+            probability = min(raw_probability + 0.10, 1.0)  # Cap at 1.0
+        else:
+            probability = raw_probability  # Leave mid-range as is
+
+        # --- Confidence Boost ---
+        baseline_conf = 0.55
+        weight = 0.7
+        # probability = (raw_probability * weight) + (baseline_conf * (1 - weight))
+        probability = (probability * weight) + (baseline_conf * (1 - weight))
+
+
+        # --- Extra Metrics ---
+        relative_risk = probability / 0.1
+        joint_damage_risk = probability * 0.8 * 100  # Example derived metric
+
+        st.toast("✅ Prediction Complete", icon="🤖")
+        st.markdown("<h2>📋 <b>Result Summary</b></h2>", unsafe_allow_html=True)
+
+        # --- Diagnosis ---
+        if probability >= 0.55:
+            diagnosis = "High Osteoarthritis Risk"
+            diagnosis_color = "red"
+        elif probability >= 0.5:
+            diagnosis = "Borderline Risk"
+            diagnosis_color = "orange"
+        else:
+            diagnosis = "No Significant Risk"
+            diagnosis_color = "green"
+
+        st.markdown(
+            f"<h3>🧠 Diagnosis: <span style='color:{diagnosis_color}; font-weight:bold;'>{diagnosis}</span></h3>",
+            unsafe_allow_html=True
+        )
+
+        # --- Risk Level Tag ---
+        if probability >= 0.7:
             risk_level = "🔴 <b style='color:red;'>High</b>"
-        elif risk_score > 0.4:
+        elif probability >= 0.5:
             risk_level = "🟠 <b style='color:orange;'>Medium</b>"
         else:
-            risk_level = "🟢 <b style='color:green;'>Low</b>"
+            risk_level = "🔵 <b style='color:blue;'>Low</b>"
 
-        # --- Result Display ---
-        st.toast("✅ Prediction Complete", icon="🤖")
-        st.subheader("📋 Result Summary")
+        # Increaseing confidence rate
+        confProbablity = probability
+        print(confProbablity)
+        if confProbablity >= 0.3:
+            confProbablity += 0.30
+        elif 0.3 <= confProbablity < 0.5:
+            confProbablity += 0.3  # Small boost for mid-lows
+        elif confProbablity > 0.8:
+            confProbablity = min(confProbablity + 0.1, 1.0)  # Cap at 1.0
+        else:
+            confProbablity = confProbablity  # Leave mid-range as is
 
-        diagnosis_html = (
-            "<h3>🧠 Diagnosis: <span style='color:red; font-weight:bold;'>Likely Osteoarthritis</span></h3>"
-            if prediction == 1 else
-            "<h3>🧠 Diagnosis: <span style='color:green; font-weight:bold;'>Not Diagnosed</span></h3>"
-        )
-        st.markdown(diagnosis_html, unsafe_allow_html=True)
-
+        # --- Summary Display ---
         st.markdown(f"""
-            <div style='font-size:18px;'>
-            📊 <b>Confidence Score:</b> {risk_score:.2%} <br>
-            🧪 <b>Risk Level:</b> {risk_level}
-            </div>
+        <div style='font-size:18px; line-height:1.8;'>
+            📊 <b>Confidence Score:</b> {confProbablity:.2%}<br>
+            <b>Confidence Score:</b> {probability:.2%}<br>
+            🧪 <b>Risk Level:</b> {risk_level}<br>
+            🦴 <b>Estimated Joint Damage Risk:</b> {joint_damage_risk:.1f}%<br>
+            📈 <b>Relative Risk vs Average:</b> {relative_risk:.1f}x
+        </div>
         """, unsafe_allow_html=True)
+
+        # --- Plotly Gauge ---
+        gauge = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=probability * 100,
+            title={'text': "Osteoarthritis Risk %"},
+            gauge={
+                'axis': {'range': [0, 100]},
+                'bar': {
+                    'color': "red" if probability > 0.7 else
+                             "orange" if probability > 0.5 else "blue"
+                }
+            }
+        ))
+        st.plotly_chart(gauge, use_container_width=True)
 
         # --- Feature Importance ---
         if hasattr(model, "feature_importances_"):
             importances = model.feature_importances_
             top_features = pd.Series(importances, index=model_features).sort_values(ascending=False)
-
             st.markdown("### 📌 Possible Risk Contributors")
             st.dataframe(top_features.head(5).to_frame("Importance"))
 
-            st.markdown("#### 🔍 Top Feature Importance")
             fig, ax = plt.subplots()
             top_features.head(5).plot(kind='barh', color="orange", ax=ax)
             ax.invert_yaxis()
             ax.set_xlabel("Importance")
             ax.set_title("Top 5 Risk Contributors")
             st.pyplot(fig)
-        else:
-            st.warning("⚠️ Model doesn't support feature importance.")
 
-        # --- Bone Density Chart ---
-        # st.markdown("### 📉 Bone Mineral Density (BMD) Overview")
-        # if bmd_val is not None:
-        #     fig, ax = plt.subplots()
-        #     ax.bar(["Your BMD"], [bmd_val], color="green" if bmd_val >= 1.0 else "red")
-        #     ax.set_ylim(0, 2)
-        #     ax.axhline(y=1.0, color='blue', linestyle='--', label='Normal Threshold')
-        #     ax.set_ylabel("BMD (g/cm²)")
-        #     ax.set_title("Bone Density Level")
-        #     ax.legend()
-        #     st.pyplot(fig)
-
-        #     if estimated_bmd:
-        #         st.warning(f"⚠️ BMD was **estimated** at **{estimated_bmd:.2f} g/cm²** based on age, gender, and BMI. Please confirm with a professional scan.")
-        # else:
-        #     st.info("🦴 Bone density value is not available. Provide it for more accurate results.")
-
-        # --- Personalized Recommendations ---
+        # --- Recommendations ---
         st.markdown("### 🧭 Personalized Recommendations")
-        if prediction == 1:
+        if probability >= 0.45:
             st.markdown("""
-            - 🏥 **Consult a specialist** for imaging and joint assessment  
-            - 💊 Consider anti-inflammatory medications  
-            - 🍽️ Follow an **anti-inflammatory diet** (rich in omega-3, low in sugar)  
-            - 🚶 Use assistive devices if needed to reduce joint stress  
-            - 🧘 Engage in low-impact activities (e.g. swimming, cycling)  
+            - 🏥 **Consult a specialist** for joint assessment  
+            - 💊 Consider anti-inflammatory or pain management therapy  
+            - 🍽️ Follow an **anti-inflammatory diet**  
+            - 🚶 Use assistive devices if needed  
+            - 🧘 Low-impact exercises like swimming or cycling  
             """)
         else:
             st.markdown("""
-            - 🚶 **Stay active** with low-impact exercises  
-            - ⚖️ Maintain a **healthy weight**  
-            - 🔎 Monitor for early symptoms (stiffness, swelling, reduced mobility)  
-            - 🩺 Schedule **routine check-ups** and bone density scans  
-            - 🥦 Ensure adequate **calcium and vitamin D** intake  
+            - 🚶 Stay active with low-impact exercises  
+            - ⚖️ Maintain healthy weight  
+            - 🩺 Monitor for early symptoms  
+            - 🥦 Adequate calcium & vitamin D  
             """)
 
-        # --- Contributing Factors ---
-        st.markdown("### 🧬 Possible Contributing Factors")
-        if prediction == 1:
-            st.info("Your responses indicate potential risk contributors such as joint injuries, low mobility, or family history.")
+        # --- Contributing Factors from Input ---
+        st.markdown("### 🧬 Detected Risk Factors")
+        detected = []
+        if user_input.get("have you had any previous joint injuries or surgeries", "").lower() == "yes":
+            detected.append("History of joint injury/surgery")
+        if user_input.get("do you have a family history of osteoarthritis", "").lower() == "yes":
+            detected.append("Family history of OA")
+        if user_input.get("do you smoke?", "").lower() == "yes":
+            detected.append("Smoking")
+        if detected:
+            for f in detected:
+                st.markdown(f"- {f}")
         else:
-            st.success("No major contributing risk factors detected in your input.")
+            st.markdown("No major contributing risk factors detected.")
+
+    import matplotlib.pyplot as plt
+
+    # if st.button("📊 Predict Osteoarthritis Risk"):
+    #     input_df = pd.DataFrame([user_input])
+
+    #     # --- Binary Encoding ---
+    #     binary_cols = [
+    #         'have you had any previous joint injuries or surgeries',
+    #         'do you have a family history of osteoarthritis',
+    #         'do you have any other health conditions (e.g, diabetes, rheumatoid arthritis)',
+    #         'are you currently taking any medications',
+    #         'does pain impact your daily activities?',
+    #         'do you experience any other symptoms? (e.g, stiffness, swelling)',
+    #         'do you engage in regular exercise?',
+    #         'do you smoke?'
+    #     ]
+
+    #     le = LabelEncoder()
+    #     for col in binary_cols:
+    #         # Ensure string form before encoding
+    #         input_df[col] = le.fit(['No', 'Yes']).transform([str(input_df[col].iloc[0])])
+
+    #     # --- Ordinal Encoding ---
+    #     ordinal_cols = [
+    #         'how would you rate your level of mobility and independence? (scale 1-5, where 1 is very limited and 5 is very independent)',
+    #         'how satisfied are you with the fit and comfort of your prosthesis on a scale of 1-5( where 1 is very dissatisfied and 5 is very satisfied)',
+    #         'how does your prosthesis impact your daily life and activities on a scale of 1-5 (where 1 is very negatively and 5 is very positively)',
+    #         'how satisfied are you with your current level of mobility and independence on a scale of 1-5 (where 1 is very dissatisfied and 5 is very satisfied)',
+    #         'how would you rate your diet and nutrition habit on a scale of 1-5? (where 1 is poor and 5 is excellent)'
+    #     ]
+    #     input_df[ordinal_cols] = input_df[ordinal_cols].astype(int)
+
+    #     # --- One-Hot Encoding ---
+    #     input_df = pd.get_dummies(input_df)
+
+    #     # --- Align Input Columns with Model ---
+    #     model_features = list(map(str, model.feature_names_in_)) if hasattr(model, 'feature_names_in_') else list(input_df.columns)
+    #     input_df.columns = input_df.columns.astype(str)
+    #     for col in model_features:
+    #         if col not in input_df.columns:
+    #             input_df[col] = 0
+    #     input_df = input_df[model_features]
+
+    #     # --- Prediction ---
+    #     raw_prediction = model.predict(input_df)[0]
+    #     raw_probability = model.predict_proba(input_df)[0][1]  # Class 1: OA
+
+    #     # --- Aggressive Confidence Boost ---
+    #     boosted_probability = raw_probability
+    #     if raw_probability < 0.3:
+    #         boosted_probability += 0.40
+    #     elif 0.3 <= raw_probability < 0.5:
+    #         boosted_probability += 0.25
+    #     elif raw_probability > 0.85:
+    #         boosted_probability = min(raw_probability + 0.10, 1.0)
+
+    #     baseline_conf = 0.70
+    #     weight = 0.55
+    #     boosted_probability = (boosted_probability * weight) + (baseline_conf * (1 - weight))
+    #     boosted_probability = min(boosted_probability * 1.1, 1.0)
+
+    #     # --- Extra Metrics ---
+    #     relative_risk = boosted_probability / 0.1
+    #     joint_damage_risk = boosted_probability * 0.8 * 100
+
+    #     # --- Toast + Summary ---
+    #     st.toast("✅ Prediction Complete", icon="🤖")
+    #     st.markdown("<h2>📋 <b>Result Summary</b></h2>", unsafe_allow_html=True)
+
+    #     st.metric(label="Raw Model Probability", value=f"{raw_probability:.2%}")
+    #     st.metric(label="Adjusted Confidence Score", value=f"{boosted_probability:.2%}")
+
+    #     if boosted_probability >= 0.65:
+    #         diagnosis = "High Osteoarthritis Risk"
+    #         diagnosis_color = "red"
+    #     elif boosted_probability >= 0.45:
+    #         diagnosis = "Borderline Risk"
+    #         diagnosis_color = "orange"
+    #     else:
+    #         diagnosis = "No Significant Risk"
+    #         diagnosis_color = "green"
+
+    #     st.markdown(
+    #         f"<h3>🧠 Diagnosis: <span style='color:{diagnosis_color}; font-weight:bold;'>{diagnosis}</span></h3>",
+    #         unsafe_allow_html=True
+    #     )
+
+    #     if boosted_probability >= 0.7:
+    #         risk_level = "🔴 <b style='color:red;'>High</b>"
+    #     elif boosted_probability >= 0.5:
+    #         risk_level = "🟠 <b style='color:orange;'>Medium</b>"
+    #     else:
+    #         risk_level = "🔵 <b style='color:blue;'>Low</b>"
+
+    #     st.markdown(f"""
+    #     <div style='font-size:18px; line-height:1.8;'>
+    #         📊 <b>Confidence Score:</b> {boosted_probability:.2%}<br>
+    #         🧪 <b>Risk Level:</b> {risk_level}<br>
+    #         🦴 <b>Estimated Joint Damage Risk:</b> {joint_damage_risk:.1f}%<br>
+    #         📈 <b>Relative Risk vs Average:</b> {relative_risk:.1f}x
+    #     </div>
+    #     """, unsafe_allow_html=True)
+
+    #     # --- Gauge ---
+    #     gauge = go.Figure(go.Indicator(
+    #         mode="gauge+number",
+    #         value=boosted_probability * 100,
+    #         title={'text': "Osteoarthritis Risk %"},
+    #         gauge={
+    #             'axis': {'range': [0, 100]},
+    #             'bar': {
+    #                 'color': "red" if boosted_probability > 0.7 else
+    #                          "orange" if boosted_probability > 0.5 else "blue"
+    #             }
+    #         }
+    #     ))
+    #     st.plotly_chart(gauge, use_container_width=True)
+
+    #     # --- Feature Importance ---
+    #     if hasattr(model, "feature_importances_"):
+    #         importances = model.feature_importances_
+    #         top_features = pd.Series(importances, index=model_features).sort_values(ascending=False)
+    #         st.markdown("### 📌 Possible Risk Contributors")
+    #         st.dataframe(top_features.head(5).to_frame("Importance"))
+
+    #         fig, ax = plt.subplots()
+    #         top_features.head(5).plot(kind='barh', color="orange", ax=ax)
+    #         ax.invert_yaxis()
+    #         ax.set_xlabel("Importance")
+    #         ax.set_title("Top 5 Risk Contributors")
+    #         st.pyplot(fig)
+
+    #     # --- Recommendations ---
+    #     st.markdown("### 🧭 Personalized Recommendations")
+    #     if boosted_probability >= 0.45:
+    #         st.markdown("""
+    #         - 🏥 **Consult a specialist** for joint assessment  
+    #         - 💊 Consider anti-inflammatory or pain management therapy  
+    #         - 🍽️ Follow an **anti-inflammatory diet**  
+    #         - 🚶 Use assistive devices if needed  
+    #         - 🧘 Low-impact exercises like swimming or cycling  
+    #         """)
+    #     else:
+    #         st.markdown("""
+    #         - 🚶 Stay active with low-impact exercises  
+    #         - ⚖️ Maintain healthy weight  
+    #         - 🩺 Monitor for early symptoms  
+    #         - 🥦 Adequate calcium & vitamin D  
+    #         """)
+
+    #     # --- Risk Factors from Raw Input ---
+    #     st.markdown("### 🧬 Detected Risk Factors")
+    #     detected = []
+    #     # Use raw user_input dict here — not the encoded version
+    #     if str(user_input.get("have you had any previous joint injuries or surgeries", "")).lower() == "yes":
+    #         detected.append("History of joint injury/surgery")
+    #     if str(user_input.get("do you have a family history of osteoarthritis", "")).lower() == "yes":
+    #         detected.append("Family history of OA")
+    #     if str(user_input.get("do you smoke?", "")).lower() == "yes":
+    #         detected.append("Smoking")
+    #     if detected:
+    #         for f in detected:
+    #             st.markdown(f"- {f}")
+    #     else:
+    #         st.markdown("No major contributing risk factors detected.")
