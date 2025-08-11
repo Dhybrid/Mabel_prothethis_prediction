@@ -42,7 +42,7 @@ def show():
 
     # amp_type = st.slider("Type of Amputation (Numeric ID)", 0, 5, 2)
     amp_type = st.selectbox("Type of Amputation", [
-        "Knee", "Transtibial", "Disarticulation", "Transformoral"
+        "Hip Disariculation", "Transtibial Amputation", "Knee Disarticulation", "Transformoral Amputation"
     ])
     # amp_cause = st.slider("Cause of Amputation (Numeric ID)", 0, 5, 1)
     amp_cause = st.selectbox("Cause of Amputation", [
@@ -106,7 +106,7 @@ def show():
         'Osteopenia Family History': bool_map[osteopenia_fam],
         'Osteopenia Diagnosed': bool_map[osteopenia_diag],
         'What type of amputation?': [
-            "Knee", "Transtibial", "Disarticulation", "Transformoral"
+            "Hip Disariculation", "Transtibial Amputation", "Knee Disarticulation", "Transformoral Amputation"
         ].index(amp_type),
         'What caused the amputation?': [
             "Trauma", "Diabetes", "PAD", "Cancer", "Infection"
